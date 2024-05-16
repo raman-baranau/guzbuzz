@@ -19,8 +19,8 @@ function Logo({ size = 25 }) {
 export function NavbarSimple() {
 
   return (
-    <div className='flex justify-between items-center h-24 max-w-[1240px] mx-auto px-4 bg-gradient-to-r from-cyan-500 to-blue-500'>
-      <Logo /><h1 className='w-full text-3xl font-bold text-white ml-2'>Guzik - Buzzer App</h1>
+    <div className='flex justify-between items-center h-16 mx-auto px-4 bg-gradient-to-r from-cyan-500 to-blue-500'>
+      <Logo /><h1 className='w-full text-3xl font-bold text-white ml-2'>Guzbuzz</h1>
     </div>
   );
 }

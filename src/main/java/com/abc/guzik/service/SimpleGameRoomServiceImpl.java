@@ -1,5 +1,6 @@
 package com.abc.guzik.service;
 
+import com.abc.guzik.model.BuzzAction;
 import com.abc.guzik.model.GameRoom;
 import com.abc.guzik.model.User;
 import com.abc.guzik.util.BuzzUtil;
@@ -34,7 +35,7 @@ public class SimpleGameRoomServiceImpl implements GameRoomService {
     public GameRoom join(User user, GameRoom room) {
         GameRoom r = findById(room.getId());
         r.getUsers().add(user);
-        simpMessagingTemplate.convertAndSend("/topic/" + r.getId() + "/users", r.getUsers());
+        simpMessagingTemplate.convertAndSend("/topic/" + r.getId() + ".connected.users", r.getUsers());
         return r;
     }
 
@@ -42,6 +43,12 @@ public class SimpleGameRoomServiceImpl implements GameRoomService {
     public GameRoom leave(User user, GameRoom room) {
         GameRoom r = findById(room.getId());
         r.getUsers().remove(user);
+        simpMessagingTemplate.convertAndSend("/topic/" + r.getId() + ".connected.users", r.getUsers());
         return r;
+    }
+
+    @Override
+    public void buzz(BuzzAction buzz) {
+        simpMessagingTemplate.convertAndSend("/topic/" + buzz.getGameRoomId() + ".buzzes", buzz);
     }
 }

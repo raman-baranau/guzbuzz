@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { GAME_URL } from "App";
 
-const GAME_URL = 'http://localhost:8080';
-const WS_ENDPOINT = 'ws://localhost:8080/ws-endpoint';
 
-export function JoinComponent() {
+export function JoinComponent({ setAuth }) {
   const navigate = useNavigate();
   const [roomCode, setRoomCode] = useState('');
   const [name, setName] = useState('');
@@ -26,8 +25,8 @@ export function JoinComponent() {
     setLoading(true);
     try {
       const createRes = await createRoom();
-      if (createRes.status !== 200) {
-        //throw new Error();
+      if (createRes.status !== 201) {
+        throw new Error();
       }
       const roomID = createRes.data.id;
       await enterRoom(roomID, true);
@@ -54,6 +53,13 @@ export function JoinComponent() {
     if (!hosting) {
       setLoading(true);
     }
+    const auth = {
+      playerName: name,
+      roomId: roomId,
+    };
+    setAuth(auth);
+    setLoading(false);
+    navigate(`/${roomId}`);
   }
 
   return joinMode ? (

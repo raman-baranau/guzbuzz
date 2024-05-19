@@ -20,7 +20,6 @@ public class WebsocketEventListener {
         SimpMessageHeaderAccessor headers = SimpMessageHeaderAccessor.wrap(event.getMessage());
         String gameRoomId = headers.getNativeHeader("gameRoomId").get(0);
         headers.getSessionAttributes().put("gameRoomId", gameRoomId);
-        //User joiningUser = new User(event.getUser().getName());
         String playerName = headers.getNativeHeader("playerName").get(0);
         headers.getSessionAttributes().put("playerName", playerName);
         User joiningUser = new User(playerName);
@@ -33,7 +32,6 @@ public class WebsocketEventListener {
         SimpMessageHeaderAccessor headers = SimpMessageHeaderAccessor.wrap(event.getMessage());
         String gameRoomId = headers.getSessionAttributes().get("gameRoomId").toString();
         String playerName = headers.getSessionAttributes().get("playerName").toString();
-        //User leavingUser = new User(event.getUser().getName());
         User leavingUser = new User(playerName);
 
         gameRoomService.leave(leavingUser, gameRoomService.findById(gameRoomId));

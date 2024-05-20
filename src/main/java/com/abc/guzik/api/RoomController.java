@@ -22,13 +22,14 @@ public class RoomController {
     @CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000/"})
     @PostMapping(path = "/gameroom")
     @ResponseStatus(code = HttpStatus.CREATED)
-    public GameRoom createGameRoom() {
-        return gameRoomService.save(new GameRoom());
+    public GameRoom createGameRoom(@RequestBody GameRoom room) {
+        return gameRoomService.save(room);
     }
 
-    @GetMapping(path = "/gameroom/{gameRoomId}")
-    public List<User> findUsers(@PathVariable("gameRoomId") String gameRoomId) {
-        return gameRoomService.findById(gameRoomId).getUsers();
+    @SubscribeMapping("/host")
+    public User defineGameRoomHostOnSubscribe(SimpMessageHeaderAccessor headerAccessor) {
+        String gameRoomId = headerAccessor.getSessionAttributes().get("gameRoomId").toString();
+        return gameRoomService.findById(gameRoomId).getHost();
     }
 
     @SubscribeMapping("/connected.users")
@@ -38,11 +39,11 @@ public class RoomController {
     }
 
     @MessageMapping("/buzz")
-    public void buzz(SimpMessageHeaderAccessor headerAccessor) {
+    public void buzz(@Payload BuzzAction action, SimpMessageHeaderAccessor headerAccessor) {
         String roomId = headerAccessor.getSessionAttributes().get("gameRoomId").toString();
         String playerName = headerAccessor.getSessionAttributes().get("playerName").toString();
 
-        BuzzAction buzz = new BuzzAction(playerName, roomId);
+        BuzzAction buzz = new BuzzAction(playerName, roomId, action.getBuzzType());
         gameRoomService.buzz(buzz);
     }
 }

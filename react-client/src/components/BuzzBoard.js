@@ -1,5 +1,5 @@
-import { WS_ENDPOINT } from 'App';
-import React, { useState } from 'react';
+import { WS_ENDPOINT } from "App";
+import React, { useState } from "react";
 import {
   StompSessionProvider,
   useStompClient,
@@ -7,7 +7,7 @@ import {
 } from "react-stomp-hooks";
 
 
-export default function BuzzBoard({auth, setAuth}) {
+export default function BuzzBoard({ auth, setAuth }) {
 
   return (
     <StompSessionProvider
@@ -16,8 +16,8 @@ export default function BuzzBoard({auth, setAuth}) {
         console.log(str);
       }}
       connectHeaders={{
-        "gameRoomId" : auth.roomId, 
-        "playerName" : auth.playerName
+        "gameRoomId": auth.roomId,
+        "playerName": auth.playerName
       }}
       onStompError={(frame) => {
         console.log("Broker reported error: " + frame.headers["message"]);
@@ -29,9 +29,10 @@ export default function BuzzBoard({auth, setAuth}) {
   );
 }
 
-function Board({auth, setAuth}) {
+function Board({ auth, setAuth }) {
   const [connectedUsers, setConnectedUsers] = useState(new Map());
-  const [buzzed, setBuzzed]  = useState(false);
+  const [buzzed, setBuzzed] = useState(false);
+  const [isHost, setIsHost] = useState(false);
 
   const stompClient = useStompClient();
 
@@ -44,31 +45,7 @@ function Board({auth, setAuth}) {
     setConnectedUsers(map);
   }
 
-  useSubscription("/app/connected.users", processConnectedUsers);
-
-  useSubscription("/topic/" + auth.roomId +  ".connected.users", processConnectedUsers);
-
-  useSubscription("/topic/" + auth.roomId + ".buzzes", (message) => {
-    let buzz = JSON.parse(message.body);
-    setConnectedUsers(new Map(connectedUsers.set(buzz.playerName, true)));
-  });
-
-  const handleBuzz = (e) => {
-    e.preventDefault();
-    if (stompClient) {
-      stompClient.publish({
-        destination: "/app/buzz",
-        body: "buzz"
-      });
-      setBuzzed(true);
-    } else {
-      //TODO proper processing
-      console.log("No stomp client provided.");
-    }
-  }
-
-  const resetBuzzes = (e) => {
-    e.preventDefault();
+  const resetBuzzes = () => {
     setBuzzed(false);
     const m = new Map();
     for (const user of connectedUsers.keys()) {
@@ -77,25 +54,71 @@ function Board({auth, setAuth}) {
     setConnectedUsers(m);
   }
 
+  useSubscription("/app/host", (message) => {
+    let hostUser = JSON.parse(message.body);
+    setIsHost(hostUser.name === auth.playerName);
+  });
+
+  useSubscription("/app/connected.users", processConnectedUsers);
+
+  useSubscription("/topic/" + auth.roomId + ".connected.users", processConnectedUsers);
+
+  useSubscription("/topic/" + auth.roomId + ".buzzes", (message) => {
+    let buzz = JSON.parse(message.body);
+    if (buzz.buzzType === "BUZZ") {
+      setConnectedUsers(new Map(connectedUsers.set(buzz.playerName, true)));
+    } else {
+      resetBuzzes();
+    }
+  });
+
+  const handleBuzz = (e) => {
+    e.preventDefault();
+    if (stompClient) {
+      stompClient.publish({
+        destination: "/app/buzz",
+        body: JSON.stringify({ buzzType: "BUZZ" })
+      });
+      setBuzzed(true);
+    } else {
+      //TODO proper processing
+      console.log("No stomp client provided - " + stompClient);
+    }
+  }
+
+  const sendResetBuzzes = () => {
+    if (stompClient) {
+      stompClient.publish({
+        destination: "/app/buzz",
+        body: JSON.stringify({ buzzType: "RESET" })
+      });
+    } else {
+      //TODO proper processing
+      console.log("No stomp client provided - " + stompClient);
+    }
+  }
+
   return (
-    <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm text-center text-xl">
+    <div className="mt-10 pb-10 sm:mx-auto sm:w-full sm:max-w-sm text-center text-xl">
       <p>Room {auth.roomId}</p>
       <div className="mt-5 mb-5">
-        <button 
+        <button
           className={"w-80 h-80 text-7xl font-bold rounded-full " + (buzzed ? "btn-gray" : "btn-blue")}
           onClick={handleBuzz}
           disabled={buzzed}>
-            {buzzed ? "Buzzed" : "Buzz"}
+          {buzzed ? "Buzzed" : "Buzz"}
         </button>
       </div>
-      <div>
-        <button
-          className={(buzzed ? "btn-blue-out" : "btn-trp")}
-          onClick={resetBuzzes}
-          disabled={!buzzed}>
-          Reset all buzzers
-        </button>
-      </div>
+      {isHost ? (
+        <div>
+          <button
+            className={([...connectedUsers.keys()].filter(a => connectedUsers.get(a)).length > 0 ? "btn-blue-out" : "btn-trp")}
+            onClick={sendResetBuzzes}
+            disabled={[...connectedUsers.keys()].filter(a => connectedUsers.get(a)).length === 0}>
+            Reset all buzzers
+          </button>
+        </div>
+      ) : null}
       <div className="relative flex py-5 items-center">
         <div className="flex-grow border-t border-slate-400"></div>
       </div>
@@ -104,7 +127,7 @@ function Board({auth, setAuth}) {
         <ul className="text-2xl font-semibold">
           {
             [...connectedUsers.keys()].filter(a => connectedUsers.get(a)).map(user => (
-              <li>{ user }</li>
+              <li>{user}</li>
             ))
           }
         </ul>
@@ -114,7 +137,7 @@ function Board({auth, setAuth}) {
         <ul className="text-2xl font-semibold">
           {
             [...connectedUsers.keys()].filter(a => !connectedUsers.get(a)).map(user => (
-              <li>{ user }</li>
+              <li>{user}</li>
             ))
           }
         </ul>

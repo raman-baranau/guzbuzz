@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { GAME_URL } from "App";
 
 
@@ -10,7 +10,7 @@ export function JoinComponent({ setAuth }) {
   const [name, setName] = useState('');
   const [joinMode, setJoinMode] = useState(true);
   const [loading, setLoading] = useState(false);
-  
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -38,7 +38,9 @@ export function JoinComponent({ setAuth }) {
 
   async function createRoom() {
     try {
-      const response = axios.post(`${GAME_URL}/gameroom`);
+      const response = axios.post(`${GAME_URL}/gameroom`, {
+        host: { name: name }
+      });
       return response;
     } catch (error) {
       if (error.response) {
@@ -76,9 +78,9 @@ export function JoinComponent({ setAuth }) {
               setRoomCode(e.target.value);
             }} />
           <span className="block text-sm font-medium text-slate-700 mt-4">Your Name</span>
-          <input 
+          <input
             type="text"
-            className="npt" 
+            className="npt"
             value={name}
             onChange={(e) => {
               setName(e.target.value);
@@ -94,14 +96,14 @@ export function JoinComponent({ setAuth }) {
         <div className="flex-grow border-t border-slate-700"></div>
       </div>
       <button
-        className="w-full btn btn-blue mt-4 py-2 px-4 font-bold rounded" 
-        type="button" 
+        className="w-full btn btn-blue mt-4 py-2 px-4 font-bold rounded"
+        type="button"
         onClick={
           () => {
             setJoinMode(false);
           }
         }>
-          Create room
+        Create room
       </button>
     </div>
   ) : (
@@ -110,9 +112,9 @@ export function JoinComponent({ setAuth }) {
         <h3 className="w-full text-2xl font-medium font-bol text-slate-700 mb-4">Host a game</h3>
         <label className="block">
           <span className="block text-sm font-medium text-slate-700 mt-4">Your Name</span>
-          <input 
+          <input
             type="text"
-            className="npt" 
+            className="npt"
             value={name}
             onChange={(e) => {
               setName(e.target.value);
@@ -128,14 +130,14 @@ export function JoinComponent({ setAuth }) {
         <div className="flex-grow border-t border-slate-700"></div>
       </div>
       <button
-        className="w-full btn btn-blue mt-4 py-2 px-4 font-bold rounded" 
-        type="button" 
+        className="w-full btn btn-blue mt-4 py-2 px-4 font-bold rounded"
+        type="button"
         onClick={
           () => {
             setJoinMode(true);
           }
         }>
-          Enter room
+        Enter room
       </button>
     </div>
   )

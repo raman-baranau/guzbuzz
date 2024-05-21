@@ -13,6 +13,7 @@ import java.util.List;
 public class GameRoom {
     @Id
     private String id;
+    private User host;
     @EqualsAndHashCode.Exclude
     private List<User> users = new ArrayList<>();
 }

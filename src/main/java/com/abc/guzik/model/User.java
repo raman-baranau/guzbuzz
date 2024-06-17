@@ -8,5 +8,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
+    /**
+     * {gameroom}-{name}-{counter}
+     */
     String name;
+    String token;
+    GameRoom room;
 }

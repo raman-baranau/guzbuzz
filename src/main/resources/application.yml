@@ -6,3 +6,6 @@ spring:
     redis:
       repositories:
         enabled: true
+logging:
+  level:
+    root: INFO

@@ -7,7 +7,7 @@ import com.abc.guzik.model.User;
 public interface GameRoomService {
     GameRoom save(GameRoom room);
     GameRoom findById(String gameRoomId);
-    GameRoom join(User user, GameRoom room);
-    GameRoom leave(User user, GameRoom room);
+    void joinNotify(String roomId);
+    GameRoom leave(User user, String roomId);
     void buzz(BuzzAction buzz);
 }

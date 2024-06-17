@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class RedisGameRoomServiceImpl implements GameRoomService {
 
@@ -30,19 +32,21 @@ public class RedisGameRoomServiceImpl implements GameRoomService {
     }
 
     @Override
-    public GameRoom join(User user, GameRoom room) {
-        GameRoom r = findById(room.getId());
-        r.getUsers().add(user);
-        gameRoomRepository.save(r);
-
+    public void joinNotify(String roomId) {
+        GameRoom r = findById(roomId);
         simpMessagingTemplate.convertAndSend("/topic/" + r.getId() + ".connected.users", r.getUsers());
-        return r;
     }
 
     @Override
-    public GameRoom leave(User user, GameRoom room) {
-        GameRoom r = findById(room.getId());
-        r.getUsers().remove(user);
+    public GameRoom leave(User user, String roomId) {
+        GameRoom r = findById(roomId);
+        Optional<User> first = r.getUsers().stream()
+                .filter(u -> u.getName().equals(user.getName()))
+                .findFirst();
+        r.getUsers().remove(first.get());
+        if (r.getUsers().size() == 1) {
+            r.setHost(r.getUsers().get(0));
+        }
         gameRoomRepository.save(r);
 
         simpMessagingTemplate.convertAndSend("/topic/" + r.getId() + ".connected.users", r.getUsers());

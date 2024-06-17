@@ -3,7 +3,9 @@ package com.abc.guzik.api;
 import com.abc.guzik.model.BuzzAction;
 import com.abc.guzik.model.GameRoom;
 import com.abc.guzik.model.User;
+import com.abc.guzik.model.dto.RegisteredUserDto;
 import com.abc.guzik.service.GameRoomService;
+import com.abc.guzik.service.RoomUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.*;
@@ -14,16 +16,25 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin("http://localhost:3000")
 public class RoomController {
 
     @Autowired
     private GameRoomService gameRoomService;
 
-    @CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000/"})
+    @Autowired
+    private RoomUserService roomUserService;
+
     @PostMapping(path = "/gameroom")
     @ResponseStatus(code = HttpStatus.CREATED)
-    public GameRoom createGameRoom(@RequestBody GameRoom room) {
-        return gameRoomService.save(room);
+    public GameRoom createGameRoom() {
+        return gameRoomService.save(new GameRoom());
+    }
+
+    @PostMapping("/new-user")
+    @ResponseStatus(code = HttpStatus.CREATED)
+    public RegisteredUserDto createUser(@RequestBody User user) {
+        return roomUserService.createUser(user);
     }
 
     @SubscribeMapping("/host")

@@ -1,5 +1,6 @@
 import { WS_ENDPOINT } from "App";
 import React, { useState } from "react";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import {
   StompSessionProvider,
   useStompClient,
@@ -8,24 +9,35 @@ import {
 
 
 export default function BuzzBoard({ auth, setAuth }) {
+  const { id } = useParams();
+  const navigate = useNavigate();
 
   return (
-    <StompSessionProvider
-      url={WS_ENDPOINT}
-      debug={(str) => {
-        console.log(str);
-      }}
-      connectHeaders={{
-        "gameRoomId": auth.roomId,
-        "playerName": auth.playerName
-      }}
-      onStompError={(frame) => {
-        console.log("Broker reported error: " + frame.headers["message"]);
-        console.log("Additional details: " + frame.body);
-      }}
-    >
-      <Board auth={auth} setAuth={setAuth} />
-    </StompSessionProvider>
+    <>
+      {id && auth.roomId === id && auth.playerName && auth.token
+       ? (<StompSessionProvider
+          url={WS_ENDPOINT}
+          debug={(str) => {
+            console.log(str);
+          }}
+          connectHeaders={{
+            "gameRoomId": auth.roomId,
+            "playerName": auth.playerName,
+            "token": auth.token
+          }}
+          onStompError={(frame) => {
+            console.log("Broker reported error: " + frame.headers["message"]);
+            console.log("Additional details: " + frame.body);
+          }}
+          onWebSocketClose={(frame) => {
+            console.log("WS close details: " + frame.body);
+            navigate(`/`);
+          }}
+        >
+        <Board auth={auth} setAuth={setAuth} />
+      </StompSessionProvider>) 
+      : <Navigate to="/" state={{attemptedRoomId: id}}/>}
+    </>
   );
 }
 

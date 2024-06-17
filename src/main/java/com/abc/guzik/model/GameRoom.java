@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@RedisHash("gamerooms")
+@RedisHash(value = "gamerooms", timeToLive = 3600)
 public class GameRoom {
     @Id
     private String id;

@@ -1,12 +1,15 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { GAME_URL } from "App";
 
 
 export function JoinComponent({ setAuth }) {
   const navigate = useNavigate();
-  const [roomCode, setRoomCode] = useState('');
+  const location = useLocation();
+  const attemptedRoomId = location.state ? location.state.attemptedRoomId : "";
+
+  const [roomCode, setRoomCode] = useState(attemptedRoomId);
   const [name, setName] = useState('');
   const [joinMode, setJoinMode] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -38,9 +41,7 @@ export function JoinComponent({ setAuth }) {
 
   async function createRoom() {
     try {
-      const response = axios.post(`${GAME_URL}/gameroom`, {
-        host: { name: name }
-      });
+      const response = axios.post(`${GAME_URL}/gameroom`);
       return response;
     } catch (error) {
       if (error.response) {
@@ -55,9 +56,13 @@ export function JoinComponent({ setAuth }) {
     if (!hosting) {
       setLoading(true);
     }
+    const response = await axios.post(`${GAME_URL}/new-user`, {
+      name: roomId + "-" + name
+    });
     const auth = {
-      playerName: name,
       roomId: roomId,
+      playerName: response.data.name,
+      token: response.data.token
     };
     setAuth(auth);
     setLoading(false);

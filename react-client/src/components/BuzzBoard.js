@@ -139,7 +139,7 @@ function Board({ auth, setAuth }) {
         <ul className="text-2xl font-semibold">
           {
             [...connectedUsers.keys()].filter(a => connectedUsers.get(a)).map(user => (
-              <li>{user}</li>
+              <li>{user.split("-")[1]}</li>
             ))
           }
         </ul>
@@ -149,7 +149,7 @@ function Board({ auth, setAuth }) {
         <ul className="text-2xl font-semibold">
           {
             [...connectedUsers.keys()].filter(a => !connectedUsers.get(a)).map(user => (
-              <li>{user}</li>
+              <li>{user.split("-")[1]}</li>
             ))
           }
         </ul>

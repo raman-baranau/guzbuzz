@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -26,7 +27,7 @@ public class RoomUserServiceImpl implements RoomUserService {
         String[] split = user.getName().split("-");
         String roomId = split[0];
         Optional<GameRoom> gameRoom = gameRoomRepository.findById(roomId);
-        GameRoom room = gameRoom.orElseThrow();
+        GameRoom room = gameRoom.orElseThrow(() -> new NoSuchElementException("Game room " + roomId + "not found"));
         String token = TokenUtil.generateNewToken();
         user.setToken(bCryptPasswordEncoder.encode(token));
         user.setName(split[0] + "-" + split[1] + "-" + (room.getUsers().size() + 1));

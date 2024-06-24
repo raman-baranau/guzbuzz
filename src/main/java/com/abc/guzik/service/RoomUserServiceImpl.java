@@ -27,7 +27,7 @@ public class RoomUserServiceImpl implements RoomUserService {
         String[] split = user.getName().split("-");
         String roomId = split[0];
         Optional<GameRoom> gameRoom = gameRoomRepository.findById(roomId);
-        GameRoom room = gameRoom.orElseThrow(() -> new NoSuchElementException("Game room " + roomId + "not found"));
+        GameRoom room = gameRoom.orElseThrow(() -> new NoSuchElementException("Game room " + roomId + " not found"));
         String token = TokenUtil.generateNewToken();
         user.setToken(bCryptPasswordEncoder.encode(token));
         user.setName(split[0] + "-" + split[1] + "-" + (room.getUsers().size() + 1));

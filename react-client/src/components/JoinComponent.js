@@ -56,17 +56,26 @@ export function JoinComponent({ setAuth }) {
     if (!hosting) {
       setLoading(true);
     }
-    const response = await axios.post(`${GAME_URL}/new-user`, {
-      name: roomId + "-" + name
-    });
-    const auth = {
-      roomId: roomId,
-      playerName: response.data.name,
-      token: response.data.token
-    };
-    setAuth(auth);
-    setLoading(false);
-    navigate(`/${roomId}`);
+    try {
+      const response = await axios.post(`${GAME_URL}/new-user`, {
+        name: roomId + "-" + name
+      });
+      const auth = {
+        roomId: roomId,
+        playerName: response.data.name,
+        token: response.data.token
+      };
+      setAuth(auth);
+      setLoading(false);
+      navigate(`/${roomId}`);
+    } catch (error) {
+      setLoading(false);
+      if (error.response) {
+        return error.response;
+      } else {
+        return { status: 500 };
+      }
+    }
   }
 
   return joinMode ? (

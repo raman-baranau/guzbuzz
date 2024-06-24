@@ -21,7 +21,8 @@ public class WebSecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((authz) -> authz
-                        .requestMatchers("/new-user", "/gameroom", "/ws-endpoint", "/ws-endpoint/**").permitAll()
+                        .requestMatchers("/new-user", "/gameroom", "/error",
+                                "/ws-endpoint", "/ws-endpoint/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated()
                 )

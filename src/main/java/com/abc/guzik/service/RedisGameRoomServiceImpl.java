@@ -1,10 +1,12 @@
 package com.abc.guzik.service;
 
 import com.abc.guzik.model.BuzzAction;
+import com.abc.guzik.model.BuzzType;
 import com.abc.guzik.model.GameRoom;
 import com.abc.guzik.model.User;
 import com.abc.guzik.repository.GameRoomRepository;
 import com.abc.guzik.util.BuzzUtil;
+import jakarta.security.auth.message.AuthException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -54,7 +56,14 @@ public class RedisGameRoomServiceImpl implements GameRoomService {
     }
 
     @Override
-    public void buzz(BuzzAction buzz) {
+    public void buzz(BuzzAction buzz) throws AuthException {
+        GameRoom r = findById(buzz.getGameRoomId());
+        Optional<User> first = r.getUsers().stream()
+                .filter(u -> u.getName().equals(buzz.getPlayerName()))
+                .findFirst();
+        if (BuzzType.RESET.equals(buzz.getBuzzType()) && !r.getHost().equals(first.get())) {
+            throw new AuthException("Reset buzzes action cannot be done. It can only be performed by the host.");
+        }
         simpMessagingTemplate.convertAndSend("/topic/" + buzz.getGameRoomId() + ".buzzes", buzz);
     }
 }

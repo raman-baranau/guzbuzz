@@ -1,14 +1,18 @@
 spring:
-  redis:
-    host: localhost
-    port: 6379
   data:
     redis:
+      host: redis
+      port: 6379
       repositories:
         enabled: true
 logging:
   level:
     root: INFO
+    org:
+      springframework:
+        web:
+          servlet:
+            DispatcherServlet: DEBUG
 
 server:
   error:

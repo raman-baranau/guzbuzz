@@ -1,0 +1,23 @@
+services:
+  guzbuzz-api:
+    build: .
+    networks:
+      - frontend
+      - backend
+    depends_on:
+      - redis
+  react-client:
+    build: ./react-client
+    ports:
+      - 3000:8080
+    networks:
+      - frontend
+    depends_on:
+      - guzbuzz-api
+  redis:
+    image: "redis"
+    networks:
+      - backend
+networks:
+  frontend: {}
+  backend: {}

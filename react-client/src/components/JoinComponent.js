@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { GAME_URL } from "App";
+import { GAME_URL } from "Constants";
 
 
 export function JoinComponent({ setAuth }) {

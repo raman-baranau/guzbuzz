@@ -1,4 +1,4 @@
-import { WS_ENDPOINT } from "App";
+import { WS_ENDPOINT } from "Constants";
 import React, { useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import {

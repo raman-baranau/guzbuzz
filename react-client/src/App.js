@@ -5,8 +5,6 @@ import { NavbarSimple } from "./components/NavbarSimple";
 import { JoinComponent } from "./components/JoinComponent";
 import BuzzBoard from "components/BuzzBoard";
 
-export const WS_ENDPOINT = "http://localhost:8080/ws-endpoint";
-export const GAME_URL = "http://localhost:8080";
 
 const App = () => {
   const [auth, setAuth] = useState({

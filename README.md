@@ -4,7 +4,6 @@ Buzzer app for multiplayer quiz-like games.
 It is using WebSockets for communication, Spring Boot + Redis for Backend and React.js + Tailwind CSS for Frontend.
 ## How to run
 ```
-mvn clean package
 docker compose build
 docker compose up
 ```
